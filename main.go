@@ -4,12 +4,14 @@ import (
 	"database/sql"
 	"fmt"
 	"sesame/dao"
+	"sesame/handler"
 
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/kataras/iris"
 )
 
 func main() {
-	// app := iris.Default()
+	app := iris.Default()
 
 	db, _ := sql.Open("mysql", "norris@/sesame")
 	cityDao := dao.CityDAO{db}
@@ -18,24 +20,6 @@ func main() {
 	city := cityDao.Get(1)
 	fmt.Println(city.Name)
 
-	// db, err := sql.Open("mysql", "norris@/sesame")
-	// if err != nil {
-	// 	panic(err.Error())
-	// }
-	// defer db.Close()
-
-	// app.Get("/ping", func(ctx iris.Context) {
-	// 	ctx.JSON(iris.Map{
-	// 		"message": "pong",
-	// 	})
-	// })
-
-	// app.Get("/tickets", func(ctx iris.Context) {
-	// 	from := ctx.URLParam("from")
-	// 	to := ctx.URLParam("to")
-
-	// 	app.Logger().Infof("from: %v, to: %v", from, to)
-	// })
-
-	// app.Run(iris.Addr(":8080"))
+	app.Get("/tickets", handler.TicketList)
+	app.Run(iris.Addr(":8080"))
 }
