@@ -3,23 +3,54 @@ package main
 import (
 	"database/sql"
 	"fmt"
+	"sesame/controller"
 	"sesame/dao"
-	"sesame/handler"
 
-	_ "github.com/go-sql-driver/mysql"
-	"github.com/kataras/iris"
+	_ "github.com/lib/pq"
 )
 
-func main() {
-	app := iris.Default()
+const (
+	user    = "norris"
+	dbname  = "sesame_development"
+	sslmode = "disable"
+)
 
-	db, _ := sql.Open("mysql", "norris@/sesame")
+var destinations = []interface{}{
+	"石家庄",
+	// "天津",
+	// "南京",
+	// "广州",
+	// "哈尔滨",
+	// "沈阳",
+	// "长春",
+	// "呼和浩特",
+	// "郑州",
+	// "济南",
+	// "杭州",
+	// "上海",
+	// "厦门",
+	// "成都",
+	// "重庆",
+	// "拉萨",
+	// "乌鲁木齐",
+	// "西宁",
+	// "昆明",
+}
+
+func main() {
+	db, _ := sql.Open(
+		"postgres",
+		fmt.Sprintf(
+			"user=%s dbname=%s sslmode=%s",
+			user, dbname, sslmode))
+
 	cityDao := dao.CityDAO{db}
 	defer cityDao.Close()
 
-	city := cityDao.Get(1)
-	fmt.Println(city.Name)
+	fromCity := cityDao.GetBy("name", "北京")
 
-	app.Get("/tickets", handler.TicketList)
-	app.Run(iris.Addr(":8080"))
+	for _, destination := range destinations {
+		toCity := cityDao.GetBy("name", destination)
+		controller.GetTickets(fromCity.Code, toCity.Code, "2019-01-13")
+	}
 }

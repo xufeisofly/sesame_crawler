@@ -27,8 +27,21 @@ func scan(rows *sql.Rows) interface{} {
 
 func (db CityDAO) Get(id int32) *City {
 	builder := sq.Select("*").From("cities").Where(sq.Eq{"id": id})
+	rows, _ := builder.RunWith(db).PlaceholderFormat(sq.Dollar).Query()
 
-	rows, _ := builder.RunWith(db).Query()
+	var ret interface{}
+	if rows.Next() {
+		ret = scan(rows)
+	}
+	defer rows.Close()
+
+	return ret.(*City)
+}
+
+func (db CityDAO) GetBy(column string, value interface{}) *City {
+	builder := sq.Select("*").From("cities").Where(sq.Eq{column: value.(string)})
+
+	rows, _ := builder.RunWith(db).PlaceholderFormat(sq.Dollar).Query()
 
 	var ret interface{}
 	if rows.Next() {
