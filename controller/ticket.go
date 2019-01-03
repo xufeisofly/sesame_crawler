@@ -6,7 +6,10 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	uri "net/url"
+	"sesame/proxy"
 	"strings"
+	"time"
 )
 
 type Ticket struct {
@@ -16,7 +19,7 @@ type Ticket struct {
 	Duration  string
 }
 
-func GetTickets(from_code, to_code, date string) {
+func GetTickets(from_code, to_code, date string) []Ticket {
 	baseUrl := "https://kyfw.12306.cn/otn/leftTicket/queryZ"
 
 	params := []map[string]string{
@@ -37,25 +40,35 @@ func GetTickets(from_code, to_code, date string) {
 	url = url[0 : len(url)-1]
 
 	req, err := http.NewRequest("GET", url, nil)
+	req.Header.Set("User-Agent", proxy.GetAgent())
+	req.Header.Set("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
+	req.Header.Set("Connection", "keep-alive")
+	pxy, err := uri.Parse(proxy.ReturnIp())
+	timeout := time.Duration(20 * time.Second)
+	fmt.Printf("使用代理:%s\n", pxy)
+
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	var resp *http.Response
-	resp, err = http.DefaultClient.Do(req)
+	client := &http.Client{
+		// Transport: &http.Transport{
+		// 	Proxy:           http.ProxyURL(pxy),
+		// 	TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		// },
+		Timeout: timeout,
+	}
+	resp, err = client.Do(req)
 	if err != nil {
 		log.Fatal(err)
 	}
 	s, _ := ioutil.ReadAll(resp.Body)
 
 	tickets := dumpData(s)
-	// for _, ticket := range tickets {
-	// 	fmt.Printf("车次: %s | 时长: %s \n", ticket.TrainNo, ticket.Duration)
-	// }
-	ticket := tickets[0]
-	fmt.Printf("车次: %s | 时长: %s \n", ticket.TrainNo, ticket.Duration)
-
 	defer resp.Body.Close()
+
+	return tickets
 }
 
 func dumpData(data []byte) []Ticket {

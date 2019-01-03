@@ -17,24 +17,24 @@ const (
 
 var destinations = []interface{}{
 	"石家庄",
-	// "天津",
-	// "南京",
-	// "广州",
-	// "哈尔滨",
-	// "沈阳",
-	// "长春",
-	// "呼和浩特",
-	// "郑州",
-	// "济南",
-	// "杭州",
-	// "上海",
-	// "厦门",
-	// "成都",
-	// "重庆",
-	// "拉萨",
-	// "乌鲁木齐",
-	// "西宁",
-	// "昆明",
+	"天津",
+	"南京",
+	"广州",
+	"哈尔滨",
+	"沈阳",
+	"长春",
+	"呼和浩特",
+	"郑州",
+	"济南",
+	"杭州",
+	"上海",
+	"厦门",
+	"成都",
+	"重庆",
+	"拉萨",
+	"乌鲁木齐",
+	"西宁",
+	"昆明",
 }
 
 func main() {
@@ -51,6 +51,9 @@ func main() {
 
 	for _, destination := range destinations {
 		toCity := cityDao.GetBy("name", destination)
-		controller.GetTickets(fromCity.Code, toCity.Code, "2019-01-13")
+		tickets := controller.GetTickets(fromCity.Code, toCity.Code, "2019-01-13")
+		ticket := tickets[0]
+		fmt.Printf("车次: %s | 时长: %s \n", ticket.TrainNo, ticket.Duration)
 	}
+	// proxy.GetIp("https://67.205.146.139:8080")
 }
