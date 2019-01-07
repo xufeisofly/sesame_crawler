@@ -19,7 +19,7 @@ type City struct {
 	UpdatedAt time.Time
 }
 
-func scan(rows *sql.Rows) interface{} {
+func scanCity(rows *sql.Rows) interface{} {
 	b := &City{}
 	rows.Scan(&b.Id, &b.Name, &b.Code, &b.CreatedAt, &b.UpdatedAt)
 	return b
@@ -31,7 +31,7 @@ func (db CityDAO) Get(id int32) *City {
 
 	var ret interface{}
 	if rows.Next() {
-		ret = scan(rows)
+		ret = scanCity(rows)
 	}
 	defer rows.Close()
 
@@ -45,9 +45,30 @@ func (db CityDAO) GetBy(column string, value interface{}) *City {
 
 	var ret interface{}
 	if rows.Next() {
-		ret = scan(rows)
+		ret = scanCity(rows)
 	}
 	defer rows.Close()
 
 	return ret.(*City)
+}
+
+func (db CityDAO) MGetByTag(value int) []*City {
+	builder := sq.
+		Select("cities.*").
+		From("cities").
+		LeftJoin("city_tag_relations AS r ON r.city_id =  cities.id").
+		LeftJoin("tags ON tags.id = r.tag_id").
+		Where(sq.Eq{"tags.category": value})
+
+	rows, err := builder.RunWith(db).PlaceholderFormat(sq.Dollar).Query()
+	if err != nil {
+		panic(err)
+	}
+	defer rows.Close()
+
+	var ret []*City
+	for rows.Next() {
+		ret = append(ret, scanCity(rows).(*City))
+	}
+	return ret
 }

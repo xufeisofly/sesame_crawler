@@ -38,22 +38,55 @@ var destinations = []interface{}{
 }
 
 func main() {
+	// Init DB
 	db, _ := sql.Open(
 		"postgres",
 		fmt.Sprintf(
 			"user=%s dbname=%s sslmode=%s",
 			user, dbname, sslmode))
 
+	// Init city dao
 	cityDao := dao.CityDAO{db}
+	ticketDao := dao.TicketDAO{db}
 	defer cityDao.Close()
 
-	fromCity := cityDao.GetBy("name", "北京")
+	// Get All Stations By Tag
+	cities := cityDao.MGetByTag(1)
 
-	for _, destination := range destinations {
-		toCity := cityDao.GetBy("name", destination)
-		tickets := controller.GetTickets(fromCity.Code, toCity.Code, "2019-01-13")
-		ticket := tickets[0]
-		fmt.Printf("车次: %s | 时长: %s \n", ticket.TrainNo, ticket.Duration)
+	for _, startCity := range cities {
+		for _, endCity := range cities {
+			if startCity == endCity {
+				continue
+			}
+
+			tickets := controller.GetTickets(startCity.Code, endCity.Code, "2019-01-13")
+			if len(tickets) == 0 {
+				continue
+			}
+
+			ticket := tickets[0]
+			ticketDao.Create(
+				startCity.Id,
+				endCity.Id,
+				ticket.TrainNo,
+				ticket.StartTime,
+				ticket.EndTime,
+				ticket.Duration,
+			)
+			fmt.Printf("车次: %s | 时长: %s \n", ticket.TrainNo, ticket.Duration)
+		}
 	}
-	// proxy.GetIp("https://67.205.146.139:8080")
 }
+
+// func main() {
+// 	db, _ := sql.Open(
+// 		"postgres",
+// 		fmt.Sprintf(
+// 			"user=%s dbname=%s sslmode=%s",
+// 			user, dbname, sslmode))
+
+// 	ticketDao := dao.TicketDAO{db}
+// 	defer ticketDao.Close()
+// 	id := ticketDao.Create(1, 69, "G85", "08:00", "09:00", "01:00")
+// 	fmt.Println(id)
+// }

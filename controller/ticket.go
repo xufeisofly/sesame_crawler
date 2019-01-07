@@ -2,11 +2,9 @@ package controller
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
-	uri "net/url"
 	"sesame/proxy"
 	"strings"
 	"time"
@@ -43,13 +41,13 @@ func GetTickets(from_code, to_code, date string) []Ticket {
 	req.Header.Set("User-Agent", proxy.GetAgent())
 	req.Header.Set("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
 	req.Header.Set("Connection", "keep-alive")
-	pxy, err := uri.Parse(proxy.ReturnIp())
+	// pxy, err := uri.Parse(proxy.ReturnIp())
 	timeout := time.Duration(20 * time.Second)
-	fmt.Printf("使用代理:%s\n", pxy)
+	// fmt.Printf("使用代理:%s\n", pxy)
 
-	if err != nil {
-		log.Fatal(err)
-	}
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
 
 	var resp *http.Response
 	client := &http.Client{
