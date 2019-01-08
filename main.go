@@ -78,6 +78,12 @@ func main() {
 						EndTime:   ticket.EndTime,
 					}
 					ticketDao.Update(&newTicket)
+					fmt.Printf(
+						"Updated %s--%s 车次: %s | 时长: %s \n",
+						startCity.Name,
+						endCity.Name,
+						ticket.TrainNo,
+						ticket.Duration)
 				} else {
 					ticketDao.Create(
 						startCity.Id,
@@ -87,9 +93,13 @@ func main() {
 						ticket.EndTime,
 						ticket.Duration,
 					)
+					fmt.Printf(
+						"Created %s--%s 车次: %s | 时长: %s \n",
+						startCity.Name,
+						endCity.Name,
+						ticket.TrainNo,
+						ticket.Duration)
 				}
-
-				fmt.Printf("车次: %s | 时长: %s \n", ticket.TrainNo, ticket.Duration)
 			}
 			time.Sleep(1 * time.Second)
 		}

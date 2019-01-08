@@ -2,7 +2,6 @@ package dao
 
 import (
 	"database/sql"
-	"fmt"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
@@ -58,8 +57,6 @@ func (db TicketDAO) Update(ticketData *Ticket) int {
 		SetMap(columnValueMap).
 		Where(sq.Eq{"id": ticketData.Id}).
 		Suffix("RETURNING \"id\"")
-
-	fmt.Println(builder.ToSql())
 
 	var id int
 	builder.RunWith(db).PlaceholderFormat(sq.Dollar).QueryRow().Scan(&id)
