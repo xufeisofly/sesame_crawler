@@ -68,7 +68,7 @@ func main() {
 			for _, ticket := range tickets {
 				oldTicket := ticketDao.GetByRoute(startCity.Id, endCity.Id, ticket.TrainNo)
 
-				if oldTicket {
+				if oldTicket.TrainNo != "" {
 					newTicket := dao.Ticket{
 						Id:        oldTicket.Id,
 						StartId:   startCity.Id,
@@ -77,7 +77,7 @@ func main() {
 						StartTime: ticket.StartTime,
 						EndTime:   ticket.EndTime,
 					}
-					oldTicket.Update(newTicket)
+					ticketDao.Update(&newTicket)
 				} else {
 					ticketDao.Create(
 						startCity.Id,
@@ -105,6 +105,17 @@ func main() {
 
 // 	ticketDao := dao.TicketDAO{db}
 // 	defer ticketDao.Close()
-// 	id := ticketDao.Create(1, 69, "G85", "08:00", "09:00", "01:00")
+
+// 	ticket := ticketDao.GetByRoute(26, 75, "K2632")
+// 	newTicket := dao.Ticket{
+// 		Id:        ticket.Id,
+// 		StartId:   99,
+// 		EndId:     ticket.EndId,
+// 		StartTime: "hey",
+// 		EndTime:   "hey",
+// 		TrainNo:   "KKK",
+// 	}
+// 	id := ticketDao.Update(&newTicket)
+
 // 	fmt.Println(id)
 // }

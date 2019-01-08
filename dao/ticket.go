@@ -2,6 +2,7 @@ package dao
 
 import (
 	"database/sql"
+	"fmt"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
@@ -50,6 +51,7 @@ func (db TicketDAO) Update(ticketData *Ticket) int {
 		"end_id":     ticketData.EndId,
 		"start_time": ticketData.StartTime,
 		"end_time":   ticketData.EndTime,
+		"updated_at": time.Now(),
 	}
 
 	builder := sq.Update("tickets").
@@ -57,8 +59,10 @@ func (db TicketDAO) Update(ticketData *Ticket) int {
 		Where(sq.Eq{"id": ticketData.Id}).
 		Suffix("RETURNING \"id\"")
 
+	fmt.Println(builder.ToSql())
+
 	var id int
-	builder.RunWith(db).PlaceholderFormat(sq.Dol).QueryRow().Scan(&id)
+	builder.RunWith(db).PlaceholderFormat(sq.Dollar).QueryRow().Scan(&id)
 
 	return id
 }
@@ -69,12 +73,19 @@ func (db TicketDAO) GetByRoute(startId, endId int, trainNo string) *Ticket {
 		From("tickets").
 		Where(sq.Eq{"start_id": startId, "end_id": endId, "train_no": trainNo})
 	rows, err := builder.RunWith(db).PlaceholderFormat(sq.Dollar).Query()
+	if err != nil {
+		panic(err)
+	}
 
 	var ret interface{}
 	if rows.Next() {
 		ret = scanTicket(rows)
 	}
 	defer rows.Close()
+
+	if ret == nil {
+		return &Ticket{}
+	}
 
 	return ret.(*Ticket)
 }
