@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"sesame/controller"
 	"sesame/dao"
+	"time"
 
 	_ "github.com/lib/pq"
 )
@@ -64,16 +65,33 @@ func main() {
 				continue
 			}
 
-			ticket := tickets[0]
-			ticketDao.Create(
-				startCity.Id,
-				endCity.Id,
-				ticket.TrainNo,
-				ticket.StartTime,
-				ticket.EndTime,
-				ticket.Duration,
-			)
-			fmt.Printf("车次: %s | 时长: %s \n", ticket.TrainNo, ticket.Duration)
+			for _, ticket := range tickets {
+				oldTicket := ticketDao.GetByRoute(startCity.Id, endCity.Id, ticket.TrainNo)
+
+				if oldTicket {
+					newTicket := dao.Ticket{
+						Id:        oldTicket.Id,
+						StartId:   startCity.Id,
+						EndId:     endCity.Id,
+						TrainNo:   ticket.TrainNo,
+						StartTime: ticket.StartTime,
+						EndTime:   ticket.EndTime,
+					}
+					oldTicket.Update(newTicket)
+				} else {
+					ticketDao.Create(
+						startCity.Id,
+						endCity.Id,
+						ticket.TrainNo,
+						ticket.StartTime,
+						ticket.EndTime,
+						ticket.Duration,
+					)
+				}
+
+				fmt.Printf("车次: %s | 时长: %s \n", ticket.TrainNo, ticket.Duration)
+			}
+			time.Sleep(1 * time.Second)
 		}
 	}
 }

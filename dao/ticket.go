@@ -42,3 +42,39 @@ func (db TicketDAO) Create(startId int, endId int, trainNo string,
 
 	return id
 }
+
+func (db TicketDAO) Update(ticketData *Ticket) int {
+	columnValueMap := map[string]interface{}{
+		"train_no":   ticketData.TrainNo,
+		"start_id":   ticketData.StartId,
+		"end_id":     ticketData.EndId,
+		"start_time": ticketData.StartTime,
+		"end_time":   ticketData.EndTime,
+	}
+
+	builder := sq.Update("tickets").
+		SetMap(columnValueMap).
+		Where(sq.Eq{"id": ticketData.Id}).
+		Suffix("RETURNING \"id\"")
+
+	var id int
+	builder.RunWith(db).PlaceholderFormat(sq.Dol).QueryRow().Scan(&id)
+
+	return id
+}
+
+func (db TicketDAO) GetByRoute(startId, endId int, trainNo string) *Ticket {
+	builder := sq.
+		Select("*").
+		From("tickets").
+		Where(sq.Eq{"start_id": startId, "end_id": endId, "train_no": trainNo})
+	rows, err := builder.RunWith(db).PlaceholderFormat(sq.Dollar).Query()
+
+	var ret interface{}
+	if rows.Next() {
+		ret = scanTicket(rows)
+	}
+	defer rows.Close()
+
+	return ret.(*Ticket)
+}
