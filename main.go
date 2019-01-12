@@ -7,14 +7,11 @@ import (
 	"time"
 
 	"sesame/db"
-
-	_ "github.com/lib/pq"
 )
 
 func main() {
 	// Init DB
 	db := db.Database
-	fmt.Println(db)
 	// Init city dao
 	cityDao := dao.CityDAO{db}
 	ticketDao := dao.TicketDAO{db}
