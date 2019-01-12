@@ -1,3 +1,3 @@
 #!/bin/bash
 
-echo "Running local script"
+source ~/.bashrc
