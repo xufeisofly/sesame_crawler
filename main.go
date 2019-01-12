@@ -1,29 +1,17 @@
 package main
 
 import (
-	"database/sql"
 	"fmt"
 	"sesame/controller"
 	"sesame/dao"
 	"time"
 
-	_ "github.com/lib/pq"
-)
-
-const (
-	user    = "norris"
-	dbname  = "sesame_production"
-	sslmode = "disable"
+	"sesame/db"
 )
 
 func main() {
 	// Init DB
-	db, _ := sql.Open(
-		"postgres",
-		fmt.Sprintf(
-			"user=%s dbname=%s sslmode=%s",
-			user, dbname, sslmode))
-
+	db := db.Database
 	// Init city dao
 	cityDao := dao.CityDAO{db}
 	ticketDao := dao.TicketDAO{db}
