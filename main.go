@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math/rand"
 	"sesame/controller"
 	"sesame/dao"
 	"time"
@@ -68,7 +69,9 @@ func main() {
 						ticket.Duration)
 				}
 			}
-			time.Sleep(3 * time.Second)
+			secCount := 10 + rand.Intn(10)
+			fmt.Printf("delay %v seconds", secCount)
+			time.Sleep(time.Duration(secCount) * time.Second)
 		}
 	}
 }
