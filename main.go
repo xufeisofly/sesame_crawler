@@ -16,6 +16,7 @@ func main() {
 	cityDao := dao.CityDAO{db}
 	ticketDao := dao.TicketDAO{db}
 	defer cityDao.Close()
+	defer ticketDao.Close()
 
 	// Get All Stations By Tag
 	cities := cityDao.MGetByTag(1)

@@ -27,7 +27,7 @@ func scanCity(rows *sql.Rows) interface{} {
 
 func (db CityDAO) Get(id int32) *City {
 	builder := sq.Select("*").From("cities").Where(sq.Eq{"id": id})
-	rows, _ := builder.RunWith(db).PlaceholderFormat(sq.Dollar).Query()
+	rows, _ := builder.RunWith(db.DB).PlaceholderFormat(sq.Dollar).Query()
 
 	var ret interface{}
 	if rows.Next() {
@@ -41,7 +41,7 @@ func (db CityDAO) Get(id int32) *City {
 func (db CityDAO) GetBy(column string, value interface{}) *City {
 	builder := sq.Select("*").From("cities").Where(sq.Eq{column: value.(string)})
 
-	rows, _ := builder.RunWith(db).PlaceholderFormat(sq.Dollar).Query()
+	rows, _ := builder.RunWith(db.DB).PlaceholderFormat(sq.Dollar).Query()
 
 	var ret interface{}
 	if rows.Next() {
@@ -60,7 +60,7 @@ func (db CityDAO) MGetByTag(value int) []*City {
 		LeftJoin("tags ON tags.id = r.tag_id").
 		Where(sq.Eq{"tags.category": value})
 
-	rows, err := builder.RunWith(db).PlaceholderFormat(sq.Dollar).Query()
+	rows, err := builder.RunWith(db.DB).PlaceholderFormat(sq.Dollar).Query()
 	if err != nil {
 		panic(err)
 	}
