@@ -38,7 +38,7 @@ func (db TicketDAO) Create(startId int, endId int, trainNo string,
 		Suffix("RETURNING \"id\"")
 
 	var id int
-	builder.RunWith(db).PlaceholderFormat(sq.Dollar).QueryRow().Scan(&id)
+	builder.RunWith(db.DB).PlaceholderFormat(sq.Dollar).QueryRow().Scan(&id)
 
 	return id
 }
@@ -59,7 +59,7 @@ func (db TicketDAO) Update(ticketData *Ticket) int {
 		Suffix("RETURNING \"id\"")
 
 	var id int
-	builder.RunWith(db).PlaceholderFormat(sq.Dollar).QueryRow().Scan(&id)
+	builder.RunWith(db.DB).PlaceholderFormat(sq.Dollar).QueryRow().Scan(&id)
 
 	return id
 }
@@ -69,7 +69,7 @@ func (db TicketDAO) GetByRoute(startId, endId int, trainNo string) *Ticket {
 		Select("*").
 		From("tickets").
 		Where(sq.Eq{"start_id": startId, "end_id": endId, "train_no": trainNo})
-	rows, err := builder.RunWith(db).PlaceholderFormat(sq.Dollar).Query()
+	rows, err := builder.RunWith(db.DB).PlaceholderFormat(sq.Dollar).Query()
 	if err != nil {
 		panic(err)
 	}
