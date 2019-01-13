@@ -73,11 +73,13 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:1a1ecfa7b54ca3f7a0115ab5c578d7d6a5d8b605839c549e80260468c42f8be7"
+  digest = "1:dee5cc7b0f1643a7f5b15d46b75abf791c7b9a4211073bd97f37d1791f645761"
   name = "golang.org/x/net"
   packages = [
     "html",
     "html/atom",
+    "internal/socks",
+    "proxy",
   ]
   pruneopts = "UT"
   revision = "915654e7eabcea33ae277abbecf52f0d8b7a9fdc"
@@ -91,6 +93,7 @@
     "github.com/gomodule/redigo/redis",
     "github.com/joho/godotenv",
     "github.com/lib/pq",
+    "golang.org/x/net/proxy",
   ]
   solver-name = "gps-cdcl"
   solver-version = 1
