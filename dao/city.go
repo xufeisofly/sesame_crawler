@@ -2,6 +2,7 @@ package dao
 
 import (
 	"database/sql"
+	"fmt"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
@@ -59,6 +60,8 @@ func (db CityDAO) MGetByTag(value int) []*City {
 		LeftJoin("city_tag_relations AS r ON r.city_id =  cities.id").
 		LeftJoin("tags ON tags.id = r.tag_id").
 		Where(sq.Eq{"tags.category": value})
+
+	fmt.Println(db)
 
 	rows, err := builder.RunWith(db).PlaceholderFormat(sq.Dollar).Query()
 	if err != nil {
