@@ -4,9 +4,8 @@ import (
 	"fmt"
 	"sesame/controller"
 	"sesame/dao"
-	"time"
-
 	"sesame/db"
+	"time"
 )
 
 func main() {

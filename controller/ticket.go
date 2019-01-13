@@ -5,9 +5,11 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"sesame/proxy"
+	myproxy "sesame/proxy"
 	"strings"
 	"time"
+
+	"golang.org/x/net/proxy"
 )
 
 type Ticket struct {
@@ -18,7 +20,7 @@ type Ticket struct {
 }
 
 func GetTickets(from_code, to_code, date string) []Ticket {
-	baseUrl := "https://kyfw.12306.cn/otn/leftTicket/queryZ"
+	baseUri := "https://kyfw.12306.cn/otn/leftTicket/queryZ"
 
 	params := []map[string]string{
 		map[string]string{"leftTicketDTO.train_date": date},
@@ -27,34 +29,37 @@ func GetTickets(from_code, to_code, date string) []Ticket {
 		map[string]string{"purpose_codes": "ADULT"},
 	}
 
-	queryUrl := "?"
+	queryUri := "?"
 	for _, item := range params {
 		for k, v := range item {
-			queryUrl += k + "=" + v + "&"
+			queryUri += k + "=" + v + "&"
 		}
 	}
 
-	url := baseUrl + queryUrl
-	url = url[0 : len(url)-1]
+	uri := baseUri + queryUri
+	uri = uri[0 : len(uri)-1]
 
-	req, err := http.NewRequest("GET", url, nil)
-	req.Header.Set("User-Agent", proxy.GetAgent())
+	req, err := http.NewRequest("GET", uri, nil)
+	req.Header.Set("User-Agent", myproxy.GetAgent())
 	req.Header.Set("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
 	req.Header.Set("Connection", "keep-alive")
-	// pxy, err := uri.Parse(proxy.ReturnIp())
+	// pxy, err := url.Parse(myproxy.ReturnIp())
 	timeout := time.Duration(20 * time.Second)
-	// fmt.Printf("使用代理:%s\n", pxy)
 
 	// if err != nil {
 	// 	log.Fatal(err)
 	// }
 
+	dialer, err := proxy.SOCKS5("tcp", "127.0.0.1:9050", nil, proxy.Direct)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	var resp *http.Response
 	client := &http.Client{
-		// Transport: &http.Transport{
-		// 	Proxy:           http.ProxyURL(pxy),
-		// 	TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-		// },
+		Transport: &http.Transport{
+			Dial: dialer.Dial,
+		},
 		Timeout: timeout,
 	}
 	resp, err = client.Do(req)
