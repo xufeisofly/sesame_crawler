@@ -2,12 +2,12 @@ package controller
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
 	myproxy "sesame/proxy"
 	"strings"
-	"time"
 
 	"golang.org/x/net/proxy"
 )
@@ -38,13 +38,13 @@ func GetTickets(from_code, to_code, date string) []Ticket {
 
 	uri := baseUri + queryUri
 	uri = uri[0 : len(uri)-1]
+	uri = "https://www.niltouch.cn"
 
 	req, err := http.NewRequest("GET", uri, nil)
 	req.Header.Set("User-Agent", myproxy.GetAgent())
 	req.Header.Set("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
 	req.Header.Set("Connection", "keep-alive")
 	// pxy, err := url.Parse(myproxy.ReturnIp())
-	timeout := time.Duration(20 * time.Second)
 
 	// if err != nil {
 	// 	log.Fatal(err)
@@ -60,14 +60,13 @@ func GetTickets(from_code, to_code, date string) []Ticket {
 		Transport: &http.Transport{
 			Dial: dialer.Dial,
 		},
-		Timeout: timeout,
 	}
 	resp, err = client.Do(req)
 	if err != nil {
 		log.Fatal(err)
 	}
 	s, _ := ioutil.ReadAll(resp.Body)
-
+	fmt.Println(string(s))
 	tickets := dumpData(s)
 	defer resp.Body.Close()
 
