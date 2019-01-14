@@ -42,8 +42,14 @@ func GetTickets(from_code, to_code, date string) []Ticket {
 
 	req, err := http.NewRequest("GET", uri, nil)
 	req.Header.Set("User-Agent", myproxy.GetAgent())
-	req.Header.Set("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
+	req.Header.Set("Accept", "*/*")
+	req.Header.Set("Accept-Encoding", "gzip, deflate, br")
+	req.Header.Set("Accept-Language", "zh-CN,zh;q=0.9,en;q=0.8")
+	req.Header.Set("Cache-Control", "no-cache")
 	req.Header.Set("Connection", "keep-alive")
+	req.Header.Set("Host", "kyfw.12306.cn")
+	req.Header.Set("If-Modified-Since", "0")
+	req.Header.Set("X-Requested-With", "XMLHttpRequest")
 	// pxy, err := url.Parse(myproxy.ReturnIp())
 
 	// if err != nil {
