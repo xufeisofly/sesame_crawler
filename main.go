@@ -1,8 +1,9 @@
 package main
 
 import (
-	"fmt"
+	"log"
 	"math/rand"
+	"os"
 	"sesame/controller"
 	"sesame/dao"
 	"time"
@@ -23,6 +24,14 @@ func sync() {
 
 	// Get All Stations By Tag
 	cities := cityDao.MGetByTag(1)
+
+	f, err := os.OpenFile("application.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+	if err != nil {
+		log.Fatalf("error opening file: %v", err)
+	}
+	defer f.Close()
+
+	log.SetOutput(f)
 
 	for _, startCity := range cities {
 		for _, endCity := range cities {
@@ -48,7 +57,7 @@ func sync() {
 						EndTime:   ticket.EndTime,
 					}
 					ticketDao.Update(&newTicket)
-					fmt.Printf(
+					log.Printf(
 						"Updated %s--%s 车次: %s | 时长: %s \n",
 						startCity.Name,
 						endCity.Name,
@@ -63,7 +72,7 @@ func sync() {
 						ticket.EndTime,
 						ticket.Duration,
 					)
-					fmt.Printf(
+					log.Printf(
 						"Created %s--%s 车次: %s | 时长: %s \n",
 						startCity.Name,
 						endCity.Name,
@@ -72,7 +81,7 @@ func sync() {
 				}
 			}
 			secCount := 10 + rand.Intn(10)
-			fmt.Printf("delay %v seconds", secCount)
+			log.Printf("delay %v seconds", secCount)
 			time.Sleep(time.Duration(secCount) * time.Second)
 		}
 	}
@@ -80,6 +89,7 @@ func sync() {
 
 func main() {
 	c := cron.New()
-	c.AddFunc("@daily", sync)
+	c.AddFunc("@every 1min", sync)
 	c.Start()
+	select {}
 }
