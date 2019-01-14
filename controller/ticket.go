@@ -9,8 +9,6 @@ import (
 	myproxy "sesame/proxy"
 	"strconv"
 	"time"
-
-	"golang.org/x/net/proxy"
 )
 
 type Ticket struct {
@@ -20,12 +18,12 @@ type Ticket struct {
 	Duration  string
 }
 
-func GetTickets(from_code, to_code, date string) []Ticket {
+func GetTickets(from, to, date string) []Ticket {
 	baseUrl := "https://train.qunar.com/dict/open/s2s.do"
 	curTime := time.Now().Unix() * 1000
 	params := []map[string]string{
-		map[string]string{"dptStation": "北京"},
-		map[string]string{"arrStation": "上海"},
+		map[string]string{"dptStation": from},
+		map[string]string{"arrStation": to},
 		map[string]string{"date": date},
 		map[string]string{"type": "normal"},
 		map[string]string{"user": "neibu"},
@@ -52,16 +50,16 @@ func GetTickets(from_code, to_code, date string) []Ticket {
 	req.Header.Set("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
 	req.Header.Set("Connection", "keep-alive")
 
-	dialer, err := proxy.SOCKS5("tcp", "127.0.0.1:9050", nil, proxy.Direct)
-	if err != nil {
-		log.Fatal(err)
-	}
+	// dialer, err := proxy.SOCKS5("tcp", "127.0.0.1:9050", nil, proxy.Direct)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
 
 	var resp *http.Response
 	client := &http.Client{
-		Transport: &http.Transport{
-			Dial: dialer.Dial,
-		},
+		// Transport: &http.Transport{
+		// 	Dial: dialer.Dial,
+		// },
 	}
 
 	resp, err = client.Do(req)

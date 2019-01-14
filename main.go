@@ -28,7 +28,7 @@ func main() {
 				continue
 			}
 
-			tickets := controller.GetTickets(startCity.Code, endCity.Code, "2019-01-13")
+			tickets := controller.GetTickets(startCity.Name, endCity.Name, "2019-01-20")
 			if len(tickets) == 0 {
 				continue
 			}
