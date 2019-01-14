@@ -2,10 +2,12 @@ package controller
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"sesame/proxy"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -18,13 +20,21 @@ type Ticket struct {
 }
 
 func GetTickets(from_code, to_code, date string) []Ticket {
-	baseUrl := "https://kyfw.12306.cn/otn/leftTicket/queryZ"
-
+	// baseUrl := "https://kyfw.12306.cn/otn/leftTicket/queryZ"
+	baseUrl := "https://train.qunar.com/dict/open/s2s.do"
+	curTime := time.Now().Unix() * 1000
+	fmt.Println(curTime)
 	params := []map[string]string{
-		map[string]string{"leftTicketDTO.train_date": date},
-		map[string]string{"leftTicketDTO.from_station": from_code},
-		map[string]string{"leftTicketDTO.to_station": to_code},
-		map[string]string{"purpose_codes": "ADULT"},
+		map[string]string{"dptStation": "北京"},
+		map[string]string{"arrStation": "上海"},
+		map[string]string{"date": date},
+		map[string]string{"type": "normal"},
+		map[string]string{"user": "neibu"},
+		map[string]string{"source": "site"},
+		map[string]string{"start": "1"},
+		map[string]string{"num": "500"},
+		map[string]string{"sort": "3"},
+		map[string]string{"_": strconv.FormatInt(curTime, 10)},
 	}
 
 	queryUrl := "?"
@@ -36,6 +46,7 @@ func GetTickets(from_code, to_code, date string) []Ticket {
 
 	url := baseUrl + queryUrl
 	url = url[0 : len(url)-1]
+	fmt.Println(url)
 
 	req, err := http.NewRequest("GET", url, nil)
 	req.Header.Set("User-Agent", proxy.GetAgent())
@@ -62,7 +73,6 @@ func GetTickets(from_code, to_code, date string) []Ticket {
 		log.Fatal(err)
 	}
 	s, _ := ioutil.ReadAll(resp.Body)
-
 	tickets := dumpData(s)
 	defer resp.Body.Close()
 
@@ -73,7 +83,9 @@ func dumpData(data []byte) []Ticket {
 	var jsonResult map[string]interface{}
 
 	json.Unmarshal(data, &jsonResult)
-	results := jsonResult["data"].(map[string]interface{})["result"]
+	results := jsonResult["data"]
+	fmt.Println(results)
+
 	arr := results.([]interface{})
 
 	var tickets []Ticket
