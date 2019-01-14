@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"sesame/proxy"
 	"strconv"
-	"strings"
 	"time"
 )
 
@@ -83,19 +82,17 @@ func dumpData(data []byte) []Ticket {
 	var jsonResult map[string]interface{}
 
 	json.Unmarshal(data, &jsonResult)
-	results := jsonResult["data"]
-	fmt.Println(results)
-
-	arr := results.([]interface{})
+	results := jsonResult["data"].(map[string]interface{})["s2sBeanList"]
+	// fmt.Println(results)
 
 	var tickets []Ticket
-	for _, i := range arr {
-		str_arr := strings.Split(i.(string), "|")
+	for _, train := range results.([]interface{}) {
+		train := train.(map[string]interface{})
 		ticket := Ticket{
-			TrainNo:   str_arr[3],
-			StartTime: str_arr[8],
-			EndTime:   str_arr[9],
-			Duration:  str_arr[10],
+			TrainNo:   train["trainNo"].(string),
+			StartTime: train["dptTime"].(string),
+			EndTime:   train["arrTime"].(string),
+			Duration:  train["arrTime"].(string),
 		}
 		tickets = append(tickets, ticket)
 	}
