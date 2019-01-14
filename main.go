@@ -8,9 +8,11 @@ import (
 	"time"
 
 	"sesame/db"
+
+	"github.com/robfig/cron"
 )
 
-func main() {
+func sync() {
 	// Init DB
 	db := db.Database
 	// Init city dao
@@ -74,4 +76,10 @@ func main() {
 			time.Sleep(time.Duration(secCount) * time.Second)
 		}
 	}
+}
+
+func main() {
+	c := cron.New()
+	c.AddFunc("@daily", sync)
+	c.Start()
 }

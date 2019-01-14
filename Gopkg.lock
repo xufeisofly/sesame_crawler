@@ -72,6 +72,14 @@
   version = "v1.0.0"
 
 [[projects]]
+  digest = "1:ed615c5430ecabbb0fb7629a182da65ecee6523900ac1ac932520860878ffcad"
+  name = "github.com/robfig/cron"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "b41be1df696709bb6395fe435af20370037c0b4c"
+  version = "v1.1"
+
+[[projects]]
   branch = "master"
   digest = "1:1a1ecfa7b54ca3f7a0115ab5c578d7d6a5d8b605839c549e80260468c42f8be7"
   name = "golang.org/x/net"
@@ -91,6 +99,7 @@
     "github.com/gomodule/redigo/redis",
     "github.com/joho/godotenv",
     "github.com/lib/pq",
+    "github.com/robfig/cron",
   ]
   solver-name = "gps-cdcl"
   solver-version = 1
