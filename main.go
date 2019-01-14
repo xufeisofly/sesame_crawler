@@ -89,7 +89,7 @@ func sync() {
 
 func main() {
 	c := cron.New()
-	c.AddFunc("@every 10s", sync)
+	c.AddFunc("@midnight", sync)
 	c.Start()
 	select {}
 }
