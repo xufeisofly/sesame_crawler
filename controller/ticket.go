@@ -19,10 +19,8 @@ type Ticket struct {
 }
 
 func GetTickets(from_code, to_code, date string) []Ticket {
-	// baseUrl := "https://kyfw.12306.cn/otn/leftTicket/queryZ"
 	baseUrl := "https://train.qunar.com/dict/open/s2s.do"
 	curTime := time.Now().Unix() * 1000
-	fmt.Println(curTime)
 	params := []map[string]string{
 		map[string]string{"dptStation": "北京"},
 		map[string]string{"arrStation": "上海"},
@@ -51,7 +49,7 @@ func GetTickets(from_code, to_code, date string) []Ticket {
 	req.Header.Set("User-Agent", proxy.GetAgent())
 	req.Header.Set("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
 	req.Header.Set("Connection", "keep-alive")
-	// pxy, err := uri.Parse(proxy.ReturnIp())
+	// pxy, err := uri.Parse("http://200.233.204.233:23500")
 	timeout := time.Duration(20 * time.Second)
 	// fmt.Printf("使用代理:%s\n", pxy)
 
@@ -83,7 +81,6 @@ func dumpData(data []byte) []Ticket {
 
 	json.Unmarshal(data, &jsonResult)
 	results := jsonResult["data"].(map[string]interface{})["s2sBeanList"]
-	// fmt.Println(results)
 
 	var tickets []Ticket
 	for _, train := range results.([]interface{}) {
