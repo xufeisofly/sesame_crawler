@@ -75,27 +75,3 @@ func main() {
 		}
 	}
 }
-
-// func main() {
-// 	db, _ := sql.Open(
-// 		"postgres",
-// 		fmt.Sprintf(
-// 			"user=%s dbname=%s sslmode=%s",
-// 			user, dbname, sslmode))
-
-// 	ticketDao := dao.TicketDAO{db}
-// 	defer ticketDao.Close()
-
-// 	ticket := ticketDao.GetByRoute(26, 75, "K2632")
-// 	newTicket := dao.Ticket{
-// 		Id:        ticket.Id,
-// 		StartId:   99,
-// 		EndId:     ticket.EndId,
-// 		StartTime: "hey",
-// 		EndTime:   "hey",
-// 		TrainNo:   "KKK",
-// 	}
-// 	id := ticketDao.Update(&newTicket)
-
-// 	fmt.Println(id)
-// }
