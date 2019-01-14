@@ -51,13 +51,7 @@ func GetTickets(from_code, to_code, date string) []Ticket {
 	req.Header.Set("User-Agent", myproxy.GetAgent())
 	req.Header.Set("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
 	req.Header.Set("Connection", "keep-alive")
-	req.Header.Set(":authority", "train.qunar.com")
-	// pxy, err := uri.Parse("http://200.233.204.233:23500")
-	// fmt.Printf("使用代理:%s\n", pxy)
 
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
 	dialer, err := proxy.SOCKS5("tcp", "127.0.0.1:9050", nil, proxy.Direct)
 	if err != nil {
 		log.Fatal(err)
