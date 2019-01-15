@@ -9,8 +9,6 @@ import (
 	"time"
 
 	"sesame/db"
-
-	"github.com/robfig/cron"
 )
 
 func sync() {
@@ -88,8 +86,5 @@ func sync() {
 }
 
 func main() {
-	c := cron.New()
-	c.AddFunc("@midnight", sync)
-	c.Start()
-	select {}
+	sync()
 }
