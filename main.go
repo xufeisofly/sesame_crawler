@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"math/rand"
 	"os"
@@ -87,4 +88,5 @@ func sync() {
 
 func main() {
 	sync()
+	fmt.Println("Done!")
 }
