@@ -2,11 +2,12 @@ package controller
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
+	uri "net/url"
 	myproxy "sesame/proxy"
+	"sesame/proxypool"
 	"strconv"
 	"time"
 )
@@ -43,28 +44,32 @@ func GetTickets(from, to, date string) []Ticket {
 
 	url := baseUrl + queryUrl
 	url = url[0 : len(url)-1]
-	fmt.Println(url)
 
 	req, err := http.NewRequest("GET", url, nil)
 	req.Header.Set("User-Agent", myproxy.GetAgent())
 	req.Header.Set("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
 	req.Header.Set("Connection", "keep-alive")
 
-	// dialer, err := proxy.SOCKS5("tcp", "127.0.0.1:9050", nil, proxy.Direct)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
+	proxyIp := proxypool.ReturnIp()
+	proxyUrl, _ := uri.Parse("http://" + proxyIp)
+	log.Printf("使用代理: %s \n", proxyUrl)
+
+	timeout := time.Duration(10 * time.Second)
 
 	var resp *http.Response
 	client := &http.Client{
-		// Transport: &http.Transport{
-		// 	Dial: dialer.Dial,
-		// },
+		Transport: &http.Transport{
+			Proxy: http.ProxyURL(proxyUrl),
+		},
+		Timeout: timeout,
 	}
 
 	resp, err = client.Do(req)
 	if err != nil {
-		log.Fatal(err)
+		proxypool.RemoveRedis(proxyIp)
+		log.Println("发生错误", err)
+		log.Printf("代理 %s 失效，从代理池中移除", proxyIp)
+		return GetTickets(from, to, date)
 	}
 	s, _ := ioutil.ReadAll(resp.Body)
 	tickets := dumpData(s)

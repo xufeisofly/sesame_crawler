@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"math/rand"
 	"os"
@@ -79,7 +78,7 @@ func sync() {
 						ticket.Duration)
 				}
 			}
-			secCount := 10 + rand.Intn(10)
+			secCount := 0 + rand.Intn(3)
 			log.Printf("delay %v seconds", secCount)
 			time.Sleep(time.Duration(secCount) * time.Second)
 		}
@@ -88,5 +87,9 @@ func sync() {
 
 func main() {
 	sync()
-	fmt.Println("Done!")
+	// fmt.Println("Done!")
+	// var alive string = "http://www.aliveproxy.com/proxy-list/proxies.aspx/Greece-gr"
+
+	// ip := proxypool.ReturnIp()
+	// fmt.Println(ip)
 }
