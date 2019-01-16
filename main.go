@@ -86,7 +86,7 @@ func sync() {
 			// mark一下
 			controller.MarkSynced(startCity.Name, endCity.Name)
 			// 延时
-			secCount := 0 + rand.Intn(3)
+			secCount := 10 + rand.Intn(10)
 			log.Printf("delay %v seconds", secCount)
 			time.Sleep(time.Duration(secCount) * time.Second)
 		}
