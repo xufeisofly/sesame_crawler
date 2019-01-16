@@ -50,7 +50,7 @@ func HasSynced(from, to string) bool {
 		log.Fatalf("err:%s", err)
 		os.Exit(1)
 	}
-	return isMember.(bool)
+	return isMember.(int64) == 1
 }
 
 func ClearSynced() {
