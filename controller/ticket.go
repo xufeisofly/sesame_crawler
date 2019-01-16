@@ -6,10 +6,13 @@ import (
 	"log"
 	"net/http"
 	uri "net/url"
+	"os"
 	myproxy "sesame/proxy"
 	"sesame/proxypool"
 	"strconv"
 	"time"
+
+	"github.com/gomodule/redigo/redis"
 )
 
 type Ticket struct {
@@ -17,6 +20,52 @@ type Ticket struct {
 	StartTime string
 	EndTime   string
 	Duration  string
+}
+
+func MarkSynced(from, to string) {
+	c, err := redis.Dial("tcp", "127.0.0.1:6379")
+	if err != nil {
+		log.Println("Connect to redis error", err)
+		return
+	}
+	defer c.Close()
+
+	_, err = c.Do("SADD", "syncs", from+"-"+to)
+	if err != nil {
+		log.Fatalf("err:%s", err)
+		os.Exit(1)
+	}
+}
+
+func HasSynced(from, to string) bool {
+	c, err := redis.Dial("tcp", "127.0.0.1:6379")
+	if err != nil {
+		log.Println("Connect to redis error", err)
+		return false
+	}
+	defer c.Close()
+
+	isMember, err := c.Do("SISMEMBER", "syncs", from+"-"+to)
+	if err != nil {
+		log.Fatalf("err:%s", err)
+		os.Exit(1)
+	}
+	return isMember.(bool)
+}
+
+func ClearSynced() {
+	c, err := redis.Dial("tcp", "127.0.0.1:6379")
+	if err != nil {
+		log.Println("Connect to redis error", err)
+		return
+	}
+	defer c.Close()
+
+	_, err = c.Do("DEL", "syncs")
+	if err != nil {
+		log.Fatalf("err:%s", err)
+		os.Exit(1)
+	}
 }
 
 func GetTickets(from, to, date string) []Ticket {
@@ -72,6 +121,12 @@ func GetTickets(from, to, date string) []Ticket {
 		return GetTickets(from, to, date)
 	}
 	s, _ := ioutil.ReadAll(resp.Body)
+	if s == nil {
+		proxypool.RemoveRedis(proxyIp)
+		log.Println("发生错误 没有数据")
+		log.Printf("代理 %s 失效，从代理池中移除", proxyIp)
+		return GetTickets(from, to, date)
+	}
 	tickets := dumpData(s)
 	defer resp.Body.Close()
 

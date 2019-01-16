@@ -37,6 +37,11 @@ func sync() {
 				continue
 			}
 
+			if controller.HasSynced(startCity.Name, endCity.Name) {
+				log.Printf("%s-%s 已同步", startCity.Name, endCity.Name)
+				continue
+			}
+
 			tickets := controller.GetTickets(startCity.Name, endCity.Name, "2019-01-20")
 			if len(tickets) == 0 {
 				continue
@@ -78,18 +83,18 @@ func sync() {
 						ticket.Duration)
 				}
 			}
+			// mark一下
+			controller.MarkSynced(startCity.Name, endCity.Name)
+			// 延时
 			secCount := 0 + rand.Intn(3)
 			log.Printf("delay %v seconds", secCount)
 			time.Sleep(time.Duration(secCount) * time.Second)
 		}
 	}
+	controller.ClearSynced()
+	log.Println("同步完毕！清空sync记录")
 }
 
 func main() {
 	sync()
-	// fmt.Println("Done!")
-	// var alive string = "http://www.aliveproxy.com/proxy-list/proxies.aspx/Greece-gr"
-
-	// ip := proxypool.ReturnIp()
-	// fmt.Println(ip)
 }
