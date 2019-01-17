@@ -146,7 +146,7 @@ func dumpData(data []byte) []Ticket {
 			TrainNo:   train["trainNo"].(string),
 			StartTime: train["dptTime"].(string),
 			EndTime:   train["arrTime"].(string),
-			Duration:  train["arrTime"].(string),
+			Duration:  train["extraBeanMap"].(map[string]interface{})["interval"].(string),
 		}
 		tickets = append(tickets, ticket)
 	}
