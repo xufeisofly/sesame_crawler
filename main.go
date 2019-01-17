@@ -31,8 +31,10 @@ func sync() {
 
 	log.SetOutput(f)
 
-	for _, startCity := range cities {
-		for _, endCity := range cities {
+	for x, startCity := range cities {
+		for y, endCity := range cities {
+			// 显示进度
+			log.Printf("%v/%v ============ \n", x*y, len(cities)*len(cities))
 			if startCity == endCity {
 				continue
 			}
