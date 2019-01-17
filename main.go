@@ -34,8 +34,8 @@ func sync() {
 	for x, startCity := range cities {
 		for y, endCity := range cities {
 			// 显示进度
-			log.Printf("%v/%v ============ \n", x*y, len(cities)*len(cities))
-			if startCity == endCity {
+			log.Printf("%v/%v ============ \n", x*len(cities)+y, len(cities)*len(cities))
+			if startCity.Name == endCity.Name {
 				continue
 			}
 
