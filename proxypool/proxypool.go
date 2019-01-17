@@ -26,6 +26,13 @@ var alives = []string{
 	"http://www.aliveproxy.com/com-proxy-list/",
 	"http://www.aliveproxy.com/net-proxy-list/",
 	"http://www.aliveproxy.com/fastest-proxies/",
+	"http://www.aliveproxy.com/org-proxy-list/",
+	"http://www.aliveproxy.com/transparent-proxy-list/",
+	"http://www.aliveproxy.com/proxy-list-port-80/",
+	"http://www.aliveproxy.com/proxy-list-port-81/",
+	"http://www.aliveproxy.com/proxy-list-port-3128/",
+	"http://www.aliveproxy.com/proxy-list-port-8000/",
+	"http://www.aliveproxy.com/proxy-list-port-8080/",
 }
 
 func GetIp(ip string) {
