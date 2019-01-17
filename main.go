@@ -1,8 +1,9 @@
 package main
 
 import (
-	"fmt"
+	"log"
 	"math/rand"
+	"os"
 	"sesame/controller"
 	"sesame/dao"
 	"time"
@@ -10,7 +11,7 @@ import (
 	"sesame/db"
 )
 
-func main() {
+func sync() {
 	// Init DB
 	db := db.Database
 	// Init city dao
@@ -22,13 +23,26 @@ func main() {
 	// Get All Stations By Tag
 	cities := cityDao.MGetByTag(1)
 
+	f, err := os.OpenFile("application.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+	if err != nil {
+		log.Fatalf("error opening file: %v", err)
+	}
+	defer f.Close()
+
+	log.SetOutput(f)
+
 	for _, startCity := range cities {
 		for _, endCity := range cities {
 			if startCity == endCity {
 				continue
 			}
 
-			tickets := controller.GetTickets(startCity.Code, endCity.Code, "2019-01-13")
+			if controller.HasSynced(startCity.Name, endCity.Name) {
+				log.Printf("%s-%s 已同步", startCity.Name, endCity.Name)
+				continue
+			}
+
+			tickets := controller.GetTickets(startCity.Name, endCity.Name, "2019-01-20")
 			if len(tickets) == 0 {
 				continue
 			}
@@ -46,7 +60,7 @@ func main() {
 						EndTime:   ticket.EndTime,
 					}
 					ticketDao.Update(&newTicket)
-					fmt.Printf(
+					log.Printf(
 						"Updated %s--%s 车次: %s | 时长: %s \n",
 						startCity.Name,
 						endCity.Name,
@@ -61,7 +75,7 @@ func main() {
 						ticket.EndTime,
 						ticket.Duration,
 					)
-					fmt.Printf(
+					log.Printf(
 						"Created %s--%s 车次: %s | 时长: %s \n",
 						startCity.Name,
 						endCity.Name,
@@ -69,33 +83,18 @@ func main() {
 						ticket.Duration)
 				}
 			}
+			// mark一下
+			controller.MarkSynced(startCity.Name, endCity.Name)
+			// 延时
 			secCount := 10 + rand.Intn(10)
-			fmt.Printf("delay %v seconds", secCount)
+			log.Printf("delay %v seconds", secCount)
 			time.Sleep(time.Duration(secCount) * time.Second)
 		}
 	}
+	controller.ClearSynced()
+	log.Println("同步完毕！清空sync记录")
 }
 
-// func main() {
-// 	db, _ := sql.Open(
-// 		"postgres",
-// 		fmt.Sprintf(
-// 			"user=%s dbname=%s sslmode=%s",
-// 			user, dbname, sslmode))
-
-// 	ticketDao := dao.TicketDAO{db}
-// 	defer ticketDao.Close()
-
-// 	ticket := ticketDao.GetByRoute(26, 75, "K2632")
-// 	newTicket := dao.Ticket{
-// 		Id:        ticket.Id,
-// 		StartId:   99,
-// 		EndId:     ticket.EndId,
-// 		StartTime: "hey",
-// 		EndTime:   "hey",
-// 		TrainNo:   "KKK",
-// 	}
-// 	id := ticketDao.Update(&newTicket)
-
-// 	fmt.Println(id)
-// }
+func main() {
+	sync()
+}
