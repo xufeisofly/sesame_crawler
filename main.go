@@ -44,7 +44,7 @@ func sync() {
 				continue
 			}
 
-			tickets := controller.GetTickets(startCity.Name, endCity.Name, "2019-01-20")
+			tickets := controller.GetTickets(startCity.Name, endCity.Name, "2019-02-01")
 			if len(tickets) == 0 {
 				continue
 			}
