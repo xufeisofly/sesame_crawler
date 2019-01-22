@@ -103,7 +103,7 @@ func GetTickets(from, to, date string) []Ticket {
 	proxyUrl, _ := uri.Parse("http://" + proxyIp)
 	log.Printf("使用代理: %s \n", proxyUrl)
 
-	timeout := time.Duration(10 * time.Second)
+	timeout := time.Duration(5 * time.Second)
 
 	var resp *http.Response
 	client := &http.Client{
