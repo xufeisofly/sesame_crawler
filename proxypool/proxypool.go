@@ -14,21 +14,6 @@ import (
 	"github.com/gomodule/redigo/redis"
 )
 
-// var alives = []string{
-// 	"http://www.aliveproxy.com/high-anonymity-proxy-list/",
-// 	"http://www.aliveproxy.com/anonymous-proxy-list/",
-// 	"http://www.aliveproxy.com/fr-proxy-list/",
-// 	"http://www.aliveproxy.com/gb-proxy-list/",
-// 	"http://www.aliveproxy.com/de-proxy-list/",
-// 	"http://www.aliveproxy.com/us-proxy-list/",
-// 	"http://www.aliveproxy.com/ru-proxy-list/",
-// 	"http://www.aliveproxy.com/jp-proxy-list/",
-// 	"http://www.aliveproxy.com/ca-proxy-list/",
-// 	"http://www.aliveproxy.com/com-proxy-list/",
-// 	"http://www.aliveproxy.com/net-proxy-list/",
-// 	"http://www.aliveproxy.com/fastest-proxies/",
-// }
-
 const PAGE int = 40
 
 var (
@@ -60,28 +45,6 @@ func GetIp(ip string) {
 			})
 		}
 	}
-
-	// for _, alive := range alives {
-	// 	response := GetRep(alive, ip)
-
-	// 	if response.StatusCode == 200 {
-	// 		dom, err := goquery.NewDocumentFromResponse(response)
-	// 		if err != nil {
-	// 			log.Printf("失败原因", response.StatusCode)
-	// 		}
-	// 		dom.Find("table .cw-list").Each(func(i int, context *goquery.Selection) {
-	// 			// 地址
-	// 			ipSelection := context.Find("td").Eq(0)
-	// 			ipSelection.Contents().Each(func(i int, c *goquery.Selection) {
-	// 				if i == 0 {
-	// 					ip := c.Text()
-	// 					saveRedis(ip)
-	// 					fmt.Println("获得新代理IP:", ip)
-	// 				}
-	// 			})
-	// 		})
-	// 	}
-	// }
 }
 
 func GetRep(urll string, ip string) *http.Response {
