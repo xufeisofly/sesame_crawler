@@ -7,53 +7,41 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/gomodule/redigo/redis"
 )
 
-var alives = []string{
-	"http://www.aliveproxy.com/high-anonymity-proxy-list/",
-	"http://www.aliveproxy.com/anonymous-proxy-list/",
-	"http://www.aliveproxy.com/fr-proxy-list/",
-	"http://www.aliveproxy.com/gb-proxy-list/",
-	"http://www.aliveproxy.com/de-proxy-list/",
-	"http://www.aliveproxy.com/us-proxy-list/",
-	"http://www.aliveproxy.com/ru-proxy-list/",
-	"http://www.aliveproxy.com/jp-proxy-list/",
-	"http://www.aliveproxy.com/ca-proxy-list/",
-	"http://www.aliveproxy.com/com-proxy-list/",
-	"http://www.aliveproxy.com/net-proxy-list/",
-	"http://www.aliveproxy.com/fastest-proxies/",
-	"http://www.aliveproxy.com/org-proxy-list/",
-	"http://www.aliveproxy.com/transparent-proxy-list/",
-	"http://www.aliveproxy.com/proxy-list-port-80/",
-	"http://www.aliveproxy.com/proxy-list-port-81/",
-	"http://www.aliveproxy.com/proxy-list-port-3128/",
-	"http://www.aliveproxy.com/proxy-list-port-8000/",
-	"http://www.aliveproxy.com/proxy-list-port-8080/",
-}
+const PAGE int = 40
+
+var (
+	xici string = "http://www.xicidaili.com/wn/"
+)
 
 func GetIp(ip string) {
-	for _, alive := range alives {
-		response := GetRep(alive, ip)
+
+	var count int
+
+	for i := 1; i <= PAGE; i++ {
+		response := GetRep(xici+strconv.Itoa(i), ip)
 
 		if response.StatusCode == 200 {
 			dom, err := goquery.NewDocumentFromResponse(response)
 			if err != nil {
-				log.Printf("失败原因", response.StatusCode)
+				log.Fatalf("失败原因", response.StatusCode)
 			}
-			dom.Find("table .cw-list").Each(func(i int, context *goquery.Selection) {
+			dom.Find("#ip_list tbody tr").Each(func(i int, context *goquery.Selection) {
 				// 地址
-				ipSelection := context.Find("td").Eq(0)
-				ipSelection.Contents().Each(func(i int, c *goquery.Selection) {
-					if i == 0 {
-						ip := c.Text()
-						saveRedis(ip)
-						fmt.Println("获得新代理IP:", ip)
-					}
-				})
+				ip := context.Find("td").Eq(1).Text()
+				// 端口
+				port := context.Find("td").Eq(2).Text()
+
+				ip = ip + ":" + port
+				saveRedis(ip)
+				fmt.Println("获得新代理IP:", ip)
+				count++
 			})
 		}
 	}
@@ -131,21 +119,6 @@ func RemoveRedis(ip string) {
 	defer c.Close()
 	// 将ip:port 存入set 方便返回随机的ip
 	_, err = c.Do("SREM", "IpPool", ip)
-	if err != nil {
-		log.Fatalf("err:%s", err)
-		os.Exit(1)
-	}
-}
-
-func ClearPool() {
-	c, err := redis.Dial("tcp", "127.0.0.1:6379")
-	if err != nil {
-		log.Println("Connect to redis error", err)
-		return
-	}
-	defer c.Close()
-
-	_, err = c.Do("DEL", "IpPool")
 	if err != nil {
 		log.Fatalf("err:%s", err)
 		os.Exit(1)
