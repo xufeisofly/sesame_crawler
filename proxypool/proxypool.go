@@ -8,6 +8,7 @@ import (
 	"net/url"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/PuerkitoBio/goquery"
@@ -37,8 +38,10 @@ func GetIp(ip string) {
 				ip := context.Find("td").Eq(1).Text()
 				// 端口
 				port := context.Find("td").Eq(2).Text()
-
-				ip = ip + ":" + port
+				// 类型
+				proto := context.Find("td").Eq(5).Text()
+				proto = strings.ToLower(proto)
+				ip = proto + "://" + ip + ":" + port
 				saveRedis(ip)
 				fmt.Println("获得新代理IP:", ip)
 				count++

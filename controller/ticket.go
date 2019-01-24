@@ -13,7 +13,6 @@ import (
 	"time"
 
 	"github.com/gomodule/redigo/redis"
-	"golang.org/x/net/proxy"
 )
 
 type Ticket struct {
@@ -101,11 +100,8 @@ func GetTickets(from, to, date string) []Ticket {
 	req.Header.Set("Connection", "keep-alive")
 
 	proxyIp := proxypool.ReturnIp()
-	proxyUrl, _ := uri.Parse("http://" + proxyIp)
+	proxyUrl, _ := uri.Parse(proxyIp)
 	log.Printf("使用代理: %s \n", proxyUrl)
-
-	tbProxyURL, _ := uri.Parse("socks5://127.0.0.1:9150")
-	tbDialer, _ := proxy.FromURL(tbProxyURL, proxy.Direct)
 
 	timeout := time.Duration(5 * time.Second)
 
@@ -113,7 +109,6 @@ func GetTickets(from, to, date string) []Ticket {
 	client := &http.Client{
 		Transport: &http.Transport{
 			Proxy: http.ProxyURL(proxyUrl),
-			Dial:  tbDialer.Dial,
 		},
 		Timeout: timeout,
 	}
@@ -127,7 +122,6 @@ func GetTickets(from, to, date string) []Ticket {
 	}
 	s, _ := ioutil.ReadAll(resp.Body)
 	log.Println(string(s))
-
 	tickets := dumpData(s)
 	defer resp.Body.Close()
 	defer MarkSynced(from, to)
