@@ -121,14 +121,10 @@ func GetTickets(from, to, date string) []Ticket {
 		return GetTickets(from, to, date)
 	}
 	s, _ := ioutil.ReadAll(resp.Body)
-	if s == nil {
-		proxypool.RemoveRedis(proxyIp)
-		log.Println("发生错误 没有数据")
-		log.Printf("代理 %s 失效，从代理池中移除", proxyIp)
-		return GetTickets(from, to, date)
-	}
+
 	tickets := dumpData(s)
 	defer resp.Body.Close()
+	defer MarkSynced(from, to)
 
 	return tickets
 }

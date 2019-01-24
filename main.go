@@ -85,8 +85,6 @@ func sync() {
 						ticket.Duration)
 				}
 			}
-			// mark一下
-			controller.MarkSynced(startCity.Name, endCity.Name)
 			// 延时
 			secCount := 1 + rand.Intn(1)
 			log.Printf("delay %v seconds", secCount)
