@@ -121,6 +121,7 @@ func GetTickets(from, to, date string) []Ticket {
 		return GetTickets(from, to, date)
 	}
 	s, _ := ioutil.ReadAll(resp.Body)
+	log.Println(string(s))
 
 	tickets := dumpData(s)
 	defer resp.Body.Close()
