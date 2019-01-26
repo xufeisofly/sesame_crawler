@@ -106,6 +106,9 @@ func saveRedis(ip string) {
 
 	defer c.Close()
 	// 将ip:port 存入set 方便返回随机的ip
+	if isMember, _ := c.Do("SISMEMBER", "InvalidIpPool", ip); isMember == true {
+		return
+	}
 	_, err = c.Do("SADD", "IpPool", ip)
 	if err != nil {
 		log.Fatalf("err:%s", err)
@@ -127,6 +130,7 @@ func RemoveRedis(ip string) {
 		log.Fatalf("err:%s", err)
 		os.Exit(1)
 	}
+	_, _ = c.Do("SADD", "InvalidIpPool", ip)
 }
 
 func ReturnIp() string {
