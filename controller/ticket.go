@@ -100,7 +100,7 @@ func GetTickets(from, to, date string) []Ticket {
 	req.Header.Set("Connection", "keep-alive")
 
 	proxyIp := proxypool.ReturnIp()
-	proxyUrl, _ := uri.Parse(proxyIp)
+	proxyUrl, _ := uri.Parse("http://" + proxyIp)
 	log.Printf("使用代理: %s \n", proxyUrl)
 
 	timeout := time.Duration(5 * time.Second)
