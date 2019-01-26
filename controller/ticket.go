@@ -7,7 +7,6 @@ import (
 	"net/http"
 	uri "net/url"
 	"os"
-	myproxy "sesame/proxy"
 	"sesame/proxypool"
 	"strconv"
 	"time"
@@ -95,7 +94,7 @@ func GetTickets(from, to, date string) []Ticket {
 	url = url[0 : len(url)-1]
 
 	req, err := http.NewRequest("GET", url, nil)
-	req.Header.Set("User-Agent", myproxy.GetAgent())
+	req.Header.Set("User-Agent", proxypool.GetAgent())
 	req.Header.Set("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
 	req.Header.Set("Connection", "keep-alive")
 
