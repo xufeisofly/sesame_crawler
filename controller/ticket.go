@@ -127,7 +127,7 @@ func GetTickets(from, to, date string) []Ticket {
 	if json.Unmarshal(s, &ret); ret["ret"] == false {
 		proxypool.RemoveRedis(proxyIp)
 		log.Println("发生错误", err)
-		log.Printf("代理 %s 失效，从代理池中移除", proxyIp)
+		log.Printf("代理 %s 被抓，从代理池中移除", proxyIp)
 		return GetTickets(from, to, date)
 	}
 
